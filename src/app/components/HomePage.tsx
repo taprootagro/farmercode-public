@@ -104,6 +104,37 @@ export function HomePage() {
     startTransition(() => setCurrentView(view));
   }, []);
 
+  /** 无网络或 chunk 拉取失败：不跳转、无任何提示（保持首页） */
+  const openAiAssistant = useCallback(async () => {
+    if (typeof navigator !== "undefined" && !navigator.onLine) return;
+    try {
+      await import("./AIAssistantPage");
+      navigateTo({ type: "aiAssistant" });
+    } catch {
+      /* silent */
+    }
+  }, [navigateTo]);
+
+  const openStatement = useCallback(async () => {
+    if (typeof navigator !== "undefined" && !navigator.onLine) return;
+    try {
+      await import("./StatementPage");
+      navigateTo({ type: "statement" });
+    } catch {
+      /* silent */
+    }
+  }, [navigateTo]);
+
+  const openVideoFeed = useCallback(async () => {
+    if (typeof navigator !== "undefined" && !navigator.onLine) return;
+    try {
+      await import("./VideoFeedPage");
+      navigateTo({ type: "videoFeed" });
+    } catch {
+      /* silent */
+    }
+  }, [navigateTo]);
+
   // 关闭二级页后恢复 Layout 外层滚动位置（home 主体曾 display:none 会导致 scrollTop 被重置）
   useLayoutEffect(() => {
     if (currentView.type !== "home") {
@@ -357,7 +388,8 @@ export function HomePage() {
             {/* AI助手和对账单 — 自定义图标拉伸铺满图标区 */}
             <div className="grid grid-cols-2 gap-3">
               <button 
-                onClick={() => navigateTo({ type: "aiAssistant" })}
+                type="button"
+                onClick={() => void openAiAssistant()}
                 className="bg-white rounded-2xl p-4 flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform shadow-lg aspect-square min-h-0"
               >
                 <div className="flex-1 min-h-0 w-full flex items-center justify-center overflow-hidden">
@@ -370,7 +402,8 @@ export function HomePage() {
                 <span className="text-sm text-gray-800 font-medium flex-shrink-0">{config.homeIcons?.aiAssistantLabel || t.home.aiAssistant}</span>
               </button>
               <button 
-                onClick={() => navigateTo({ type: "statement" })}
+                type="button"
+                onClick={() => void openStatement()}
                 className="bg-white rounded-2xl p-4 flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform shadow-lg aspect-square min-h-0"
               >
                 <div className="flex-1 min-h-0 w-full flex items-center justify-center overflow-hidden">
@@ -386,7 +419,8 @@ export function HomePage() {
 
             {/* 直播区域 */}
             <button 
-              onClick={() => navigateTo({ type: "videoFeed" })}
+              type="button"
+              onClick={() => void openVideoFeed()}
               className="w-full aspect-[2/1] rounded-2xl overflow-hidden relative active:scale-95 transition-transform shadow-lg bg-gray-100"
             >
               <img

@@ -30,6 +30,12 @@ function isChunkError(reason: unknown): boolean {
 window.addEventListener('unhandledrejection', (event) => {
   if (!isChunkError(event.reason)) return;
 
+  // 离线：不刷新、不清缓存、不跳转，完全静默（用户留在当前页）
+  if (typeof navigator !== 'undefined' && !navigator.onLine) {
+    event.preventDefault();
+    return;
+  }
+
   console.warn('[main] Chunk load error caught globally, attempting recovery...');
   event.preventDefault(); // 阻止控制台报错
 

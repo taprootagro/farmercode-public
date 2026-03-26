@@ -165,8 +165,12 @@ export class ErrorBoundary extends Component<Props, State> {
 
     // ---- Chunk 加载失败：走专属恢复流程 ----
     if (isChunkLoadError(error)) {
-      console.warn('[ErrorBoundary] Chunk load error, attempting recovery...');
       errorMonitor.capture(error, { type: 'react', context: 'ChunkLoadError' });
+      // 离线：不清缓存、不刷新，避免与用户「无操作」预期冲突
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        return;
+      }
+      console.warn('[ErrorBoundary] Chunk load error, attempting recovery...');
       attemptChunkRecovery();
       return;
     }
